@@ -17,6 +17,7 @@ os.environ["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
 import argparse
 import numpy as np
 import json
+import sys
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
@@ -25,6 +26,7 @@ from utils.data_loader import load_data, one_hot_encode, create_mini_batches
 from ann.neural_network import NeuralNetwork
 from ann.optimizers import SGD, Momentum, NAG, RMSProp, Adam, Nadam
 
+sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 # =========================
 # Argument Parser
