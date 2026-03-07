@@ -17,16 +17,13 @@ os.environ["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
 import argparse
 import numpy as np
 import json
-import sys
 
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import accuracy_score
 
 from utils.data_loader import load_data, one_hot_encode, create_mini_batches
 from ann.neural_network import NeuralNetwork
 from ann.optimizers import SGD, Momentum, NAG, RMSProp, Adam, Nadam
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 # =========================
 # Argument Parser
@@ -59,6 +56,23 @@ def parse_arguments():
 # Evaluation Function
 # =========================
 
+# def evaluate(model, X, y_true):
+#     y_pred = []
+
+#     for i in range(0, X.shape[0], 128):
+#         batch_X = X[i:i+128]
+#         logits = model.predict(batch_X)
+#         y_pred.append(np.argmax(logits, axis=1))
+
+#     y_pred = np.concatenate(y_pred)
+#     acc = accuracy_score(y_true, y_pred)
+
+#     logits = model.predict(X)
+#     loss = model.loss_fn.forward(logits, one_hot_encode(y_true))
+
+#     return loss, acc
+
+
 def evaluate(model, X, y_true):
     y_pred = []
 
@@ -68,7 +82,9 @@ def evaluate(model, X, y_true):
         y_pred.append(np.argmax(logits, axis=1))
 
     y_pred = np.concatenate(y_pred)
-    acc = accuracy_score(y_true, y_pred)
+
+    # numpy accuracy (replace sklearn)
+    acc = np.mean(y_pred == y_true)
 
     logits = model.predict(X)
     loss = model.loss_fn.forward(logits, one_hot_encode(y_true))
