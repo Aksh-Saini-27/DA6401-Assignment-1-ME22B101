@@ -165,30 +165,55 @@ class NeuralNetwork:
     # Autograder required functions
     # =========================
 
-    def get_weights(self):
-        """
-        Return weights dictionary.
-        Used by autograder and train script.
-        """
+    # def get_weights(self):
+    #     """
+    #     Return weights dictionary.
+    #     Used by autograder and train script.
+    #     """
 
-        weights = {}
+    #     weights = {}
 
-        for i, layer in enumerate(self.layers):
+    #     for i, layer in enumerate(self.layers):
 
-            if hasattr(layer, "W"):
-                weights[f"W_{i}"] = layer.W
-                weights[f"b_{i}"] = layer.b
+    #         if hasattr(layer, "W"):
+    #             weights[f"W_{i}"] = layer.W
+    #             weights[f"b_{i}"] = layer.b
 
-        return weights
+    #     return weights
+
+    # def set_weights(self, weights):
+    #     """
+    #     Set weights dictionary.
+    #     Used by autograder forward pass check.
+    #     """
+
+    #     for i, layer in enumerate(self.layers):
+
+    #         if hasattr(layer, "W"):
+    #             layer.W = weights[f"W_{i}"]
+    #             layer.b = weights[f"b_{i}"]
 
     def set_weights(self, weights):
-        """
-        Set weights dictionary.
-        Used by autograder forward pass check.
-        """
+        if isinstance(weights, dict):
+            for i, layer in enumerate(self.layers):
 
-        for i, layer in enumerate(self.layers):
-
-            if hasattr(layer, "W"):
-                layer.W = weights[f"W_{i}"]
-                layer.b = weights[f"b_{i}"]
+                W_key = f"W{i}"
+                b_key = f"b{i}"
+                if W_key not in weights or b_key not in weights:
+                    raise ValueError("Missing weight keys")
+                layer.W = weights[W_key]
+                layer.b = weights[b_key]
+            return
+        raise ValueError(f"Unsupported weight format: {type(weights)}")
+    
+    def get_weights(self):
+        """
+        Return all layer weights and biases in a serializable format.
+        """
+        weights = []
+        for layer in self.layers:
+            weights.append({
+                "W": layer.W,
+                "b": layer.b
+            })
+        return weights
