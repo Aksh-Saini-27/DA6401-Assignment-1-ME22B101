@@ -1,37 +1,38 @@
 """
-Data Loading and Preprocessing
-Handles MNIST and Fashion-MNIST datasets
+Data loading utilities for MNIST and Fashion-MNIST datasets.
+Handles downloading (via Keras), normalisation, and flattening.
 """
 
 import numpy as np
+from keras.datasets import mnist, fashion_mnist
 
-def load_data(dataset_name="mnist"):
-    if dataset_name == "mnist":
-        from .download_mnist import manual_mnist
-        (X_train, y_train), (X_test, y_test) = manual_mnist()
-    elif dataset_name == "fashion_mnist":
-        import keras.datasets.fashion_mnist as fashion_mnist
-        (X_train, y_train), (X_test, y_test) = fashion_mnist.load_data()
+
+def load_dataset(name: str):
+    """
+    Load, normalise, and flatten a dataset.
+
+    Args:
+        name: One of "mnist" or "fashion_mnist".
+
+    Returns:
+        Tuple (X_train, y_train, X_test, y_test) where:
+            X_*  : float32 ndarray, shape (N, 784), values in [0, 1]
+            y_*  : int ndarray, shape (N,), class indices 0-9
+    """
+    
+    if name == "mnist":
+        (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    elif name == "fashion_mnist":
+        (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
     else:
-        raise ValueError(f"Unknown dataset: {dataset_name}")
-        
-    # Normalize to [0, 1]
-    X_train = X_train.astype(np.float32) / 255.0
-    X_test = X_test.astype(np.float32) / 255.0
-    
-    # Flatten
-    X_train = X_train.reshape(X_train.shape[0], -1)
-    X_test = X_test.reshape(X_test.shape[0], -1)
-    
-    return (X_train, y_train), (X_test, y_test)
+        raise ValueError(f"Unknown dataset '{name}'. Choose 'mnist' or 'fashion_mnist'.")
 
-def one_hot_encode(y, num_classes=10):
-    return np.eye(num_classes)[y]
+    # Normalise pixel values to [0, 1]
+    x_train = x_train.astype(np.float64) / 255.0
+    x_test  = x_test.astype(np.float64)  / 255.0
 
-def create_mini_batches(X, y, batch_size):
-    indices = np.arange(X.shape[0])
-    np.random.shuffle(indices)
-    
-    for start_idx in range(0, X.shape[0] - batch_size + 1, batch_size):
-        excerpt = indices[start_idx:start_idx + batch_size]
-        yield X[excerpt], y[excerpt]
+    # Flatten 28x28 images to 784-dimensional vectors
+    x_train = x_train.reshape(x_train.shape[0], -1)
+    x_test  = x_test.reshape(x_test.shape[0],  -1)
+
+    return x_train, y_train, x_test, y_test

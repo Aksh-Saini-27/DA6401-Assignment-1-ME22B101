@@ -1,43 +1,37 @@
-"""
-Activation Functions and Their Derivatives
-Implements: ReLU, Sigmoid, Tanh, Softmax
-"""
-
 import numpy as np
 
+
 class Sigmoid:
+    def __init__(self):
+        self.out = None
+
     def forward(self, x):
-        self.output = 1.0 / (1.0 + np.exp(-x))
-        return self.output
-        
+        self.out = 1.0 / (1.0 + np.exp(-x))
+        return self.out
+
     def backward(self, grad_output):
-        return grad_output * self.output * (1.0 - self.output)
+        return grad_output * self.out * (1.0 - self.out)
+
 
 class Tanh:
+    def __init__(self):
+        self.out = None
+
     def forward(self, x):
-        self.output = np.tanh(x)
-        return self.output
-        
+        self.out = np.tanh(x)
+        return self.out
+
     def backward(self, grad_output):
-        return grad_output * (1.0 - np.square(self.output))
+        return grad_output * (1.0 - self.out ** 2)
+
 
 class ReLU:
-    def forward(self, x):
-        self.x = x
-        self.output = np.maximum(0, x)
-        return self.output
-        
-    def backward(self, grad_output):
-        return grad_output * (self.x > 0)
+    def __init__(self):
+        self.mask = None
 
-class Softmax:
     def forward(self, x):
-        # Numerically stable softmax
-        exp_x = np.exp(x - np.max(x, axis=1, keepdims=True))
-        self.output = exp_x / np.sum(exp_x, axis=1, keepdims=True)
-        return self.output
-        
+        self.mask = x > 0
+        return x * self.mask
+
     def backward(self, grad_output):
-        # Assume cross-entropy loss gradient combined (dZ = output - true_labels)
-        # So we just pass the gradient through.
-        return grad_output
+        return grad_output * self.mask
